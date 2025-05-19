@@ -1,6 +1,5 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useFrame } from "@react-three/fiber";
-import { useKeyboardControls } from "../../lib/hooks/useKeyboardControls";
 import { useTankGame } from "../../lib/stores/useTankGame";
 import { useGame } from "../../lib/stores/useGame";
 import { useAudio } from "../../lib/stores/useAudio";
@@ -8,9 +7,15 @@ import * as THREE from "three";
 
 // Controls handler for the game
 const Controls = () => {
-  const [subscribeKeys, getKeys] = useKeyboardControls();
   const { phase } = useGame();
   const { playHit } = useAudio();
+  const [keys, setKeys] = useState({
+    forward: false,
+    backward: false,
+    leftward: false,
+    rightward: false,
+    shoot: false
+  });
   
   const {
     tankPosition, 
@@ -25,29 +30,62 @@ const Controls = () => {
     damageBuilding
   } = useTankGame();
 
-  // Subscribe to control changes
+  // Handle keyboard events directly
   useEffect(() => {
-    const unsubscribeShoot = subscribeKeys(
-      state => state.shoot,
-      pressed => {
-        if (pressed && phase === 'playing') {
-          fireTankProjectile();
-          playHit();
-          console.log("Tank fired a projectile");
-        }
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Movement keys
+      if (e.code === 'KeyW' || e.code === 'ArrowUp') {
+        setKeys(prev => ({ ...prev, forward: true }));
       }
-    );
-
-    return () => {
-      unsubscribeShoot();
+      if (e.code === 'KeyS' || e.code === 'ArrowDown') {
+        setKeys(prev => ({ ...prev, backward: true }));
+      }
+      if (e.code === 'KeyA' || e.code === 'ArrowLeft') {
+        setKeys(prev => ({ ...prev, leftward: true }));
+      }
+      if (e.code === 'KeyD' || e.code === 'ArrowRight') {
+        setKeys(prev => ({ ...prev, rightward: true }));
+      }
+      
+      // Shooting
+      if (e.code === 'Space' && phase === 'playing' && !keys.shoot) {
+        setKeys(prev => ({ ...prev, shoot: true }));
+        fireTankProjectile();
+        playHit();
+        console.log("Tank fired a projectile");
+      }
     };
-  }, [subscribeKeys, phase, fireTankProjectile, playHit]);
+    
+    const handleKeyUp = (e: KeyboardEvent) => {
+      if (e.code === 'KeyW' || e.code === 'ArrowUp') {
+        setKeys(prev => ({ ...prev, forward: false }));
+      }
+      if (e.code === 'KeyS' || e.code === 'ArrowDown') {
+        setKeys(prev => ({ ...prev, backward: false }));
+      }
+      if (e.code === 'KeyA' || e.code === 'ArrowLeft') {
+        setKeys(prev => ({ ...prev, leftward: false }));
+      }
+      if (e.code === 'KeyD' || e.code === 'ArrowRight') {
+        setKeys(prev => ({ ...prev, rightward: false }));
+      }
+      if (e.code === 'Space') {
+        setKeys(prev => ({ ...prev, shoot: false }));
+      }
+    };
+    
+    window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('keyup', handleKeyUp);
+    
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('keyup', handleKeyUp);
+    };
+  }, [phase, fireTankProjectile, playHit, keys.shoot]);
 
   // Game loop - handle movement and projectiles
   useFrame((_, delta) => {
     if (phase !== 'playing') return;
-
-    const keys = getKeys();
 
     // Tank movement and rotation
     const moveSpeed = 8 * delta;
@@ -80,12 +118,10 @@ const Controls = () => {
     if (keys.forward) {
       newPosition.x += forwardVector.x * moveSpeed;
       newPosition.z += forwardVector.z * moveSpeed;
-      console.log("Moving forward");
     }
     if (keys.backward) {
       newPosition.x -= forwardVector.x * moveSpeed;
       newPosition.z -= forwardVector.z * moveSpeed;
-      console.log("Moving backward");
     }
 
     // Update tank position and rotation
