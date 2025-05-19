@@ -16,6 +16,7 @@ import SoundManager from "./components/game/SoundManager";
 import Explosions from "./components/game/Explosions";
 import EnemyTanks from "./components/game/EnemyTanks";
 import EnemyMovement from "./components/game/EnemyMovement";
+import MiniMap from "./components/game/MiniMap";
 
 // Define control keys for the game
 const controls = [
@@ -94,6 +95,7 @@ function App() {
                 <EnemyMovement />
               </Canvas>
               <GameUI />
+              <MiniMap />
             </>
           )}
 
