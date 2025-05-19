@@ -116,17 +116,31 @@ const Controls = () => {
     );
 
     // Apply movement (forward/backward)
+    let targetPosition = newPosition.clone();
+    
     if (keys.forward) {
-      newPosition.x += forwardVector.x * moveSpeed;
-      newPosition.z += forwardVector.z * moveSpeed;
+      targetPosition.x += forwardVector.x * moveSpeed;
+      targetPosition.z += forwardVector.z * moveSpeed;
     }
     if (keys.backward) {
-      newPosition.x -= forwardVector.x * moveSpeed;
-      newPosition.z -= forwardVector.z * moveSpeed;
+      targetPosition.x -= forwardVector.x * moveSpeed;
+      targetPosition.z -= forwardVector.z * moveSpeed;
+    }
+    
+    // Keep within map boundaries
+    const BOUNDARY = 45;
+    targetPosition.x = Math.max(-BOUNDARY, Math.min(BOUNDARY, targetPosition.x));
+    targetPosition.z = Math.max(-BOUNDARY, Math.min(BOUNDARY, targetPosition.z));
+    
+    // Check for collision with obstacles
+    if (checkObstacleCollision(targetPosition, 2)) {
+      // If there's a collision, find a safe position
+      const safePosition = findSafePosition(newPosition, targetPosition, 2);
+      targetPosition.copy(safePosition);
     }
 
     // Update tank position and rotation
-    setTankPosition(newPosition);
+    setTankPosition(targetPosition);
     setTankRotation({ x: 0, y: yRotation, z: 0 });
 
     // Update projectiles

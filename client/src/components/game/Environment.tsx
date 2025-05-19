@@ -179,6 +179,35 @@ const Environment: React.FC<EnvironmentProps> = ({ seed = 12345 }) => {
     return { trees, rocks, mountains };
   }, [seed]);
   
+  // Register obstacles after they're created
+  useEffect(() => {
+    // Clear any existing obstacles first
+    clearObstacles();
+    
+    // Register rocks as obstacles
+    rocks.forEach(rock => {
+      registerObstacle(
+        new THREE.Vector3(rock.position[0], rock.position[1], rock.position[2]),
+        rock.scale * 1.0, // Slightly larger collision radius than visual
+        'rock'
+      );
+    });
+    
+    // Register mountains as obstacles
+    mountains.forEach(mountain => {
+      registerObstacle(
+        new THREE.Vector3(mountain.position[0], mountain.position[1], mountain.position[2]),
+        mountain.scale * 3.5, // Mountains have larger collision radius
+        'mountain'
+      );
+    });
+    
+    return () => {
+      // Clean up obstacles when unmounting
+      clearObstacles();
+    };
+  }, [rocks, mountains]);
+
   return (
     <group>
       {/* Render all trees */}
