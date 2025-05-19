@@ -15,6 +15,7 @@ import MainMenu from "./components/game/MainMenu";
 import SoundManager from "./components/game/SoundManager";
 import Explosions from "./components/game/Explosions";
 import EnemyTanks from "./components/game/EnemyTanks";
+import EnemyMovement from "./components/game/EnemyMovement";
 
 // Define control keys for the game
 const controls = [
@@ -90,6 +91,7 @@ function App() {
 
                 <Camera />
                 <Controls />
+                <EnemyMovement />
               </Canvas>
               <GameUI />
             </>

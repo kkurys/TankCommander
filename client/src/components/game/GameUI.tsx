@@ -43,10 +43,9 @@ const GameUI = () => {
         end();
         setShowGameOver(true);
       }
-      // If all buildings and enemies are destroyed
-      else if (intactBuildings === 0 && aliveEnemies === 0 && 
-               Object.keys(buildings).length > 0 && Object.keys(enemyTanks).length > 0) {
-        setGameOverMessage("Mission Complete! All Targets Destroyed!");
+      // If all enemy tanks are destroyed (buildings are optional targets)
+      else if (aliveEnemies === 0 && Object.keys(enemyTanks).length > 0) {
+        setGameOverMessage("Mission Complete! All Enemy Tanks Destroyed!");
         end();
         setShowGameOver(true);
       }
