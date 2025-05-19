@@ -14,6 +14,7 @@ import GameUI from "./components/game/GameUI";
 import MainMenu from "./components/game/MainMenu";
 import SoundManager from "./components/game/SoundManager";
 import Explosions from "./components/game/Explosions";
+import EnemyTanks from "./components/game/EnemyTanks";
 
 // Define control keys for the game
 const controls = [
@@ -83,6 +84,7 @@ function App() {
                 <Suspense fallback={null}>
                   <Ground />
                   <Tank />
+                  <EnemyTanks />
                   <Explosions />
                 </Suspense>
 

@@ -137,7 +137,7 @@ const Controls = () => {
         z: projectile.position.z + projectile.direction.z * 20 * delta
       };
 
-      // Check for collisions with buildings
+      // Check for collisions with various objects
       let hasCollided = false;
       
       // Check if projectile is out of bounds (simple map boundary check)
@@ -149,30 +149,82 @@ const Controls = () => {
         return;
       }
 
-      // Check collisions with buildings
-      Object.entries(buildings).forEach(([buildingId, building]) => {
-        if (hasCollided) return;
-
-        // Simple AABB collision detection
-        const projectileSize = { width: 0.5, height: 0.5, depth: 0.5 };
-        const buildingSize = { width: building.size.x, height: building.size.y, depth: building.size.z };
+      // Get references to other game state
+      const { enemyTanks, damageEnemyTank, tankPosition, damageTank } = useTankGame.getState();
+      
+      // If projectile is from player, check collisions with enemy tanks
+      if (!projectile.fromEnemy) {
+        Object.entries(enemyTanks).forEach(([enemyId, enemyTank]) => {
+          if (hasCollided || enemyTank.health <= 0) return;
+          
+          // Simple collision detection with enemy tank
+          const tankSize = { width: 2, height: 2, depth: 3 };
+          
+          if (
+            newProjectilePosition.x < enemyTank.position.x + tankSize.width/2 &&
+            newProjectilePosition.x > enemyTank.position.x - tankSize.width/2 &&
+            newProjectilePosition.z < enemyTank.position.z + tankSize.depth/2 &&
+            newProjectilePosition.z > enemyTank.position.z - tankSize.depth/2
+          ) {
+            console.log(`Player projectile ${id} hit enemy tank ${enemyId}`);
+            
+            // Damage the enemy tank
+            damageEnemyTank(enemyId, 25);
+            
+            // Remove the projectile
+            removeProjectile(id);
+            hasCollided = true;
+          }
+        });
+      } 
+      // If projectile is from enemy, check collision with player tank
+      else if (projectile.fromEnemy) {
+        // Simple collision detection with player tank
+        const tankSize = { width: 2, height: 2, depth: 3 };
         
         if (
-          newProjectilePosition.x < building.position.x + buildingSize.width/2 &&
-          newProjectilePosition.x > building.position.x - buildingSize.width/2 &&
-          newProjectilePosition.z < building.position.z + buildingSize.depth/2 &&
-          newProjectilePosition.z > building.position.z - buildingSize.depth/2
+          newProjectilePosition.x < tankPosition.x + tankSize.width/2 &&
+          newProjectilePosition.x > tankPosition.x - tankSize.width/2 &&
+          newProjectilePosition.z < tankPosition.z + tankSize.depth/2 &&
+          newProjectilePosition.z > tankPosition.z - tankSize.depth/2
         ) {
-          console.log(`Projectile ${id} hit building ${buildingId}`);
+          console.log(`Enemy projectile ${id} hit player tank`);
           
-          // Damage the building
-          damageBuilding(buildingId, 25);
+          // Damage the player tank
+          damageTank(15);
           
           // Remove the projectile
           removeProjectile(id);
           hasCollided = true;
         }
-      });
+      }
+
+      // Check collisions with buildings (if no collision already found)
+      if (!hasCollided) {
+        Object.entries(buildings).forEach(([buildingId, building]) => {
+          if (hasCollided) return;
+
+          // Simple AABB collision detection
+          const projectileSize = { width: 0.5, height: 0.5, depth: 0.5 };
+          const buildingSize = { width: building.size.x, height: building.size.y, depth: building.size.z };
+          
+          if (
+            newProjectilePosition.x < building.position.x + buildingSize.width/2 &&
+            newProjectilePosition.x > building.position.x - buildingSize.width/2 &&
+            newProjectilePosition.z < building.position.z + buildingSize.depth/2 &&
+            newProjectilePosition.z > building.position.z - buildingSize.depth/2
+          ) {
+            console.log(`Projectile ${id} hit building ${buildingId}`);
+            
+            // Damage the building
+            damageBuilding(buildingId, 25);
+            
+            // Remove the projectile
+            removeProjectile(id);
+            hasCollided = true;
+          }
+        });
+      }
 
       // If no collision, update the projectile
       if (!hasCollided) {
