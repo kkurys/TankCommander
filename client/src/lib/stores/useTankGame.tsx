@@ -116,6 +116,7 @@ export const useTankGame = create<TankGameState>((set, get) => ({
     const { tankPosition, tankRotation, projectiles, projectileCount } = get();
     
     // Calculate projectile starting position (barrel end)
+    // Adjusted to match the corrected tank orientation
     const directionVector = new THREE.Vector3(
       Math.sin(tankRotation.y),
       0,

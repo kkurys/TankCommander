@@ -70,10 +70,10 @@ const Tank = () => {
           <meshStandardMaterial color="#4a5568" metalness={0.5} roughness={0.5} />
         </mesh>
         
-        {/* Tank barrel */}
+        {/* Tank barrel - Position fixed to point forward */}
         <mesh 
           ref={barrelRef}
-          position={[0, 1.2, -1.8]} 
+          position={[0, 1.2, 1.8]} 
           rotation={[Math.PI / 2, 0, 0]} 
           castShadow
         >

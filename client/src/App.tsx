@@ -65,7 +65,7 @@ function App() {
                   far: 1000
                 }}
               >
-                <color attach="background" args={["#87CEEB"]} />
+                <color attach="background" args={["#538c3d"]} />
                 
                 {/* Scene lighting */}
                 <ambientLight intensity={0.5} />
