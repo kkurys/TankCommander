@@ -4,6 +4,7 @@ import { useTankGame } from "../../lib/stores/useTankGame";
 import { useGame } from "../../lib/stores/useGame";
 import { useAudio } from "../../lib/stores/useAudio";
 import * as THREE from "three";
+import { checkObstacleCollision, findSafePosition } from "../../lib/obstacles";
 
 // Controls handler for the game
 const Controls = () => {

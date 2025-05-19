@@ -17,6 +17,7 @@ import Explosions from "./components/game/Explosions";
 import EnemyTanks from "./components/game/EnemyTanks";
 import EnemyMovement from "./components/game/EnemyMovement";
 import MiniMap from "./components/game/MiniMap";
+import Environment from "./components/game/Environment";
 
 // Define control keys for the game
 const controls = [
@@ -85,6 +86,7 @@ function App() {
 
                 <Suspense fallback={null}>
                   <Ground />
+                  <Environment />
                   <Tank />
                   <EnemyTanks />
                   <Explosions />
