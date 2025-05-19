@@ -1,4 +1,4 @@
-import { useRef, useMemo } from "react";
+import { useRef, useEffect } from "react";
 import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 import { useTankGame } from "../../lib/stores/useTankGame";
@@ -18,7 +18,7 @@ const Explosions = () => {
   const explosions = useTankGame(state => state.explosions);
   
   // Process explosions and create particles
-  useMemo(() => {
+  useEffect(() => {
     Object.values(explosions).forEach(explosion => {
       if (explosion.processed) return;
       
@@ -48,16 +48,18 @@ const Explosions = () => {
         });
       }
       
-      // Mark this explosion as processed
-      useTankGame.setState(state => ({
-        explosions: {
-          ...state.explosions,
-          [explosion.id]: {
-            ...explosion,
-            processed: true
+      // Mark this explosion as processed using a timeout to avoid state updates during render
+      setTimeout(() => {
+        useTankGame.setState(state => ({
+          explosions: {
+            ...state.explosions,
+            [explosion.id]: {
+              ...explosion,
+              processed: true
+            }
           }
-        }
-      }));
+        }));
+      }, 0);
     });
   }, [explosions]);
   
